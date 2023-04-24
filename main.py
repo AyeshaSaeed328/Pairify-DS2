@@ -14,9 +14,19 @@
 #
 # ///////////////////////////////////////////////////////////////
 
+# insert line 171
+# remove line 189
+# search line 198
+# edit/decreasekey line 207
+# 2 tables to display data
+# tableWidget and tableWidget_3
+# data loads in tableWidget from self.loaddata1() / tableWidget_3 from self.loaddata2()
+# when searching use self.search_loaddata()
+
 import sys
 import os
 import platform
+
 
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
@@ -50,7 +60,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         global widgets
         widgets = self.ui
-        self.loaddata()
+        
 
         # USE CUSTOM TITLE BAR | USE AS "False" FOR MAC OR LINUX
         # ///////////////////////////////////////////////////////////////
@@ -63,6 +73,14 @@ class MainWindow(QMainWindow):
         # APPLY TEXTS
         self.setWindowTitle(title)
         widgets.titleRightInfo.setText(description)
+        widgets.textEdit_2.setTextColor('black')
+        widgets.textEdit_3.setTextColor('black')
+        widgets.textEdit_4.setTextColor('black')
+        widgets.textEdit_5.setTextColor('black')
+        widgets.textEdit_9.setTextColor('black')
+        widgets.textEdit_10.setTextColor('black')
+        widgets.textEdit_11.setTextColor('black')
+        widgets.textEdit_12.setTextColor('black')
         
 
         # TOGGLE MENU
@@ -84,14 +102,17 @@ class MainWindow(QMainWindow):
         widgets.btn_home.clicked.connect(self.buttonClick)
         widgets.btn_widgets.clicked.connect(self.buttonClick)
         widgets.btn_new.clicked.connect(self.buttonClick)
-        widgets.btn_save.clicked.connect(self.buttonClick)
         widgets.insert_btn.clicked.connect(self.buttonClick)
+        widgets.search_btn_2.clicked.connect(self.buttonClick)
+        widgets.edit_btn_2.clicked.connect(self.buttonClick)
+        widgets.remove_btn.clicked.connect(self.buttonClick)
+        widgets.restet_btn.clicked.connect(self.buttonClick)
 
         # EXTRA LEFT BOX
-        def openCloseLeftBox():
-            UIFunctions.toggleLeftBox(self, True)
-        widgets.toggleLeftBox.clicked.connect(openCloseLeftBox)
-        widgets.extraCloseColumnBtn.clicked.connect(openCloseLeftBox)
+        # def openCloseLeftBox():
+        #     UIFunctions.toggleLeftBox(self, True)
+        # widgets.toggleLeftBox.clicked.connect(openCloseLeftBox)
+        # widgets.extraCloseColumnBtn.clicked.connect(openCloseLeftBox)
 
         # EXTRA RIGHT BOX
         def openCloseRightBox():
@@ -102,6 +123,7 @@ class MainWindow(QMainWindow):
         # ///////////////////////////////////////////////////////////////
         self.show()
         widgets.tableWidget.clicked.connect(self.mousePressEvent)
+        widgets.tableWidget_3.clicked.connect(self.mousePressEvent)
 
         # SET CUSTOM THEME
         # ///////////////////////////////////////////////////////////////
@@ -141,25 +163,64 @@ class MainWindow(QMainWindow):
             widgets.stackedWidget.setCurrentWidget(widgets.widgets)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
+            self.loaddata1()
 
         # SHOW NEW PAGE
         if btnName == "btn_new":
             widgets.stackedWidget.setCurrentWidget(widgets.new_page) # SET PAGE
             UIFunctions.resetStyle(self, btnName) # RESET ANOTHERS BUTTONS SELECTED
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet())) # SELECT MENU
+            self.loaddata2()
 
-        if btnName == "btn_save":
-            print("Save BTN clicked!")
+        
 
-        if btnName == "insert_btn":    
+        if btnName == "insert_btn": 
+            if widgets.textEdit_2.toPlainText() == "" or widgets.textEdit_3.toPlainText()== "" or widgets.textEdit_2.toPlainText() == "":
+                widgets.textEdit_5.setPlainText("You need to fill all the required fields")
+                return
             patient = Patient(widgets.textEdit_2.toPlainText(),widgets.textEdit_3.toPlainText(),widgets.textEdit_4.toPlainText())
             lst.append(patient)
             print(patient.name)
-            print("aaa")
+            # print("aaa")
             widgets.textEdit_2.clear()
             widgets.textEdit_3.clear()
             widgets.textEdit_4.clear()
-            self.loaddata()
+            self.loaddata1()
+            widgets.textEdit_5.setPlainText("Patient Successfully Added. Patient ID:"+str(patient.id))
+            widgets.textEdit_5.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+            
+
+
+
+        if btnName == "remove_btn":    
+            
+            self.loaddata1()
+
+        if btnName == "restet_btn":    
+            
+            self.loaddata2()    
+
+        if btnName == "search_btn_2":  
+            for patient in lst:
+                a = int(widgets.textEdit_11.toPlainText())
+                print(a)
+                if patient.id == int(widgets.textEdit_11.toPlainText()):
+                    self.search_loaddata(patient)
+
+            
+        if btnName == "edit_btn_2":
+            #search for patient entered in textEdit_11
+            for patient in lst:
+                if patient.id == int(widgets.textEdit_11.toPlainText()):
+                    patient.name = widgets.textEdit_12.toPlainText()
+                    patient.age = widgets.textEdit_9.toPlainText()
+                    patient.symptoms = widgets.textEdit_10.toPlainText()
+                    self.search_loaddata(patient)
+                    break        
+
+            
+             
+             
 
         # PRINT BTN NAME
         print(f'Button "{btnName}" pressed!')
@@ -182,23 +243,57 @@ class MainWindow(QMainWindow):
         #     print('Mouse click: LEFT CLICK')
         # if event.buttons() == Qt.RightButton:
         #     print('Mouse click: RIGHT CLICK')
-        a = widgets.tableWidget.currentRow()
-        pid = widgets.tableWidget.item(a,0).text()
-        pname = widgets.tableWidget.item(a,1).text()
-        page = widgets.tableWidget.item(a,2).text()
-        psymptoms = widgets.tableWidget.item(a,4).text()
+        
+        widgets.textEdit_5.clear()
+        a = widgets.tableWidget_3.currentRow()
+        pid = widgets.tableWidget_3.item(a,0).text()
+        pname = widgets.tableWidget_3.item(a,1).text()
+        page = widgets.tableWidget_3.item(a,2).text()
+        psymptoms = widgets.tableWidget_3.item(a,4).text()
+        widgets.textEdit_12.setPlainText(pname)
+        widgets.textEdit_9.setPlainText(page)
+        widgets.textEdit_10.setPlainText(psymptoms)
+        widgets.textEdit_12.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        widgets.textEdit_9.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        widgets.textEdit_10.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        print(pid,pname)
         return (pid,pname,page,psymptoms)
          
 
-    def loaddata(self):
+    def loaddata1(self):
         
         row=0
         for patient in lst:
             widgets.tableWidget.setItem(row, 0, QTableWidgetItem(str(patient.id)))
             widgets.tableWidget.setItem(row, 1, QTableWidgetItem(patient.name))
             widgets.tableWidget.setItem(row, 2, QTableWidgetItem(patient.age))
-            widgets.tableWidget.setItem(row, 3, QTableWidgetItem(patient.symptoms))
-            row=row+1        
+            # widgets.tableWidget.setItem(row, 2, QTableWidgetItem(patient.priority))
+            widgets.tableWidget.setItem(row, 4, QTableWidgetItem(patient.symptoms))
+            row=row+1    
+
+    def loaddata2(self):
+        
+        row=0
+        for patient in lst:
+            widgets.tableWidget_3.setItem(row, 0, QTableWidgetItem(str(patient.id)))
+            widgets.tableWidget_3.setItem(row, 1, QTableWidgetItem(patient.name))
+            widgets.tableWidget_3.setItem(row, 2, QTableWidgetItem(patient.age))
+            # widgets.tableWidget_3.setItem(row, 2, QTableWidgetItem(patient.priority))
+            widgets.tableWidget_3.setItem(row, 4, QTableWidgetItem(patient.symptoms))
+            row=row+1                
+
+    def search_loaddata(self,patient):
+        
+        widgets.tableWidget_3.clearContents()
+        row=0
+        widgets.tableWidget_3.setItem(row, 0, QTableWidgetItem(str(patient.id)))
+        widgets.tableWidget_3.setItem(row, 1, QTableWidgetItem(patient.name))
+        widgets.tableWidget_3.setItem(row, 2, QTableWidgetItem(patient.age))
+        # widgets.tableWidget_3.setItem(row, 3, QTableWidgetItem(patient.priority))
+        widgets.tableWidget_3.setItem(row, 4, QTableWidgetItem(patient.symptoms))
+        print(patient.symptoms)
+        print("aaa")
+                       
             
 
     
