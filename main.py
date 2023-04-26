@@ -26,7 +26,7 @@
 import sys
 import os
 import platform
-
+from pairingheap import patient_heap
 
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
@@ -41,16 +41,17 @@ widgets = None
 
 
         
-lst =[]
+# lst =[]
 
-class Patient():
-    def __init__(self,name,age,symptoms):
-        self.name = name
-        self.age = age
-        self.symptoms = symptoms
-        self.id = len(lst) + 1
+# class Patient():
+#     def __init__(self,name,age,symptoms):
+#         self.name = name
+#         self.age = age
+#         self.symptoms = symptoms
+#         self.id = len(lst) + 1
 
-   
+# patient_heap = PairingHeap()
+
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -173,51 +174,67 @@ class MainWindow(QMainWindow):
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet())) # SELECT MENU
             self.loaddata2()
 
-        
-
         if btnName == "insert_btn": 
-            if widgets.textEdit_2.toPlainText() == "" or widgets.textEdit_3.toPlainText()== "" or widgets.textEdit_2.toPlainText() == "":
+            patient_heap.inserts += 1
+            if widgets.textEdit_2.toPlainText() == "" or widgets.textEdit_3.toPlainText()== "" or widgets.textEdit_4.toPlainText() == "":
                 widgets.textEdit_5.setPlainText("You need to fill all the required fields")
                 return
-            patient = Patient(widgets.textEdit_2.toPlainText(),widgets.textEdit_3.toPlainText(),widgets.textEdit_4.toPlainText())
-            lst.append(patient)
-            print(patient.name)
+            patient = Patient(widgets.textEdit_2.toPlainText(),widgets.textEdit_3.toPlainText(),widgets.textEdit_4.toPlainText(), patient_heap.inserts)
+            # lst.append(patient)
+            # print(patient.name)
+            patient_heap.insert(patient)
+            patient_heap.display()
             # print("aaa")
             widgets.textEdit_2.clear()
             widgets.textEdit_3.clear()
             widgets.textEdit_4.clear()
             self.loaddata1()
-            widgets.textEdit_5.setPlainText("Patient Successfully Added. Patient ID:"+str(patient.id))
+            widgets.textEdit_5.setPlainText("Patient Successfully Added. Patient ID: "+str(patient.id))
             widgets.textEdit_5.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
             
 
-
-
-        if btnName == "remove_btn":    
-            
+        if btnName == "remove_btn":  
+            patient_heap.DeleteMax()  
             self.loaddata1()
 
-        if btnName == "restet_btn":    
-            
+        if btnName == "reset_btn":    
             self.loaddata2()    
 
         if btnName == "search_btn_2":  
-            for patient in lst:
-                a = int(widgets.textEdit_11.toPlainText())
-                print(a)
-                if patient.id == int(widgets.textEdit_11.toPlainText()):
-                    self.search_loaddata(patient)
+            p = patient_heap.find(int(widgets.textEdit_11.toPlainText())) #will give the node with the patient having the given id
+            if p is not None:
+                self.search_loaddata(p.patient)
+            else:
+                widgets.tableWidget_3.clearContents()
+
+            # for patient in lst:
+            #     a = int(widgets.textEdit_11.toPlainText())
+            #     print(a)
+            #     if patient.id == int(widgets.textEdit_11.toPlainText()):
+            #         self.search_loaddata(patient)
 
             
         if btnName == "edit_btn_2":
             #search for patient entered in textEdit_11
-            for patient in lst:
-                if patient.id == int(widgets.textEdit_11.toPlainText()):
-                    patient.name = widgets.textEdit_12.toPlainText()
-                    patient.age = widgets.textEdit_9.toPlainText()
-                    patient.symptoms = widgets.textEdit_10.toPlainText()
-                    self.search_loaddata(patient)
-                    break        
+            id = int(widgets.textEdit_11.toPlainText())
+            name = widgets.textEdit_12.toPlainText()
+            age = widgets.textEdit_9.toPlainText()
+            symptoms = widgets.textEdit_10.toPlainText()
+            p = patient_heap.update(id, name, age, symptoms) #updates the data and returns the patient node that was updated
+
+            # p = patient_heap.find(int(widgets.textEdit_11.toPlainText())) #will give the node witht the given id
+            # p.name = widgets.textEdit_12.toPlainText()
+            # p.age = widgets.textEdit_9.toPlainText()
+            # p.symptoms = widgets.textEdit_10.toPlainText()
+            self.search_loaddata(p)
+
+            # for patient in lst:
+            #     if patient.id == int(widgets.textEdit_11.toPlainText()):
+            #         patient.name = widgets.textEdit_12.toPlainText()
+            #         patient.age = widgets.textEdit_9.toPlainText()
+            #         patient.symptoms = widgets.textEdit_10.toPlainText()
+            #         self.search_loaddata(patient)
+            #         break        
 
             
              
@@ -262,44 +279,42 @@ class MainWindow(QMainWindow):
          
 
     def loaddata1(self):
-        
-        row=0
-        for patient in lst:
-            widgets.tableWidget.setItem(row, 0, QTableWidgetItem(str(patient.id)))
-            widgets.tableWidget.setItem(row, 1, QTableWidgetItem(patient.name))
-            widgets.tableWidget.setItem(row, 2, QTableWidgetItem(patient.age))
-            # widgets.tableWidget.setItem(row, 2, QTableWidgetItem(patient.priority))
-            widgets.tableWidget.setItem(row, 4, QTableWidgetItem(patient.symptoms))
-            row=row+1    
+        lst = patient_heap.display()
+        if lst is not None:
+            lst.sort(key = lambda x : x.priority, reverse=True)
+            row=0
+            for patient in lst:
+                widgets.tableWidget.setItem(row, 0, QTableWidgetItem(str(patient.id)))
+                widgets.tableWidget.setItem(row, 1, QTableWidgetItem(patient.name))
+                widgets.tableWidget.setItem(row, 2, QTableWidgetItem(patient.age))
+                widgets.tableWidget.setItem(row, 3, QTableWidgetItem(str(patient.priority)))
+                widgets.tableWidget.setItem(row, 4, QTableWidgetItem(patient.symptoms_str))
+                row=row+1    
 
     def loaddata2(self):
-        
-        row=0
-        for patient in lst:
+        lst = patient_heap.display()
+        if lst is not None:
+            lst.sort(key = lambda x : x.priority, reverse=True)
+            row=0
+            for patient in lst:
+                widgets.tableWidget_3.setItem(row, 0, QTableWidgetItem(str(patient.id)))
+                widgets.tableWidget_3.setItem(row, 1, QTableWidgetItem(patient.name))
+                widgets.tableWidget_3.setItem(row, 2, QTableWidgetItem(patient.age))
+                widgets.tableWidget_3.setItem(row, 3, QTableWidgetItem(str(patient.priority)))
+                widgets.tableWidget_3.setItem(row, 4, QTableWidgetItem(patient.symptoms_str))
+                row=row+1                
+
+    def search_loaddata(self,patient):
+        widgets.tableWidget_3.clearContents()
+        if patient is not None:
+            row=0
             widgets.tableWidget_3.setItem(row, 0, QTableWidgetItem(str(patient.id)))
             widgets.tableWidget_3.setItem(row, 1, QTableWidgetItem(patient.name))
             widgets.tableWidget_3.setItem(row, 2, QTableWidgetItem(patient.age))
-            # widgets.tableWidget_3.setItem(row, 2, QTableWidgetItem(patient.priority))
-            widgets.tableWidget_3.setItem(row, 4, QTableWidgetItem(patient.symptoms))
-            row=row+1                
-
-    def search_loaddata(self,patient):
-        
-        widgets.tableWidget_3.clearContents()
-        row=0
-        widgets.tableWidget_3.setItem(row, 0, QTableWidgetItem(str(patient.id)))
-        widgets.tableWidget_3.setItem(row, 1, QTableWidgetItem(patient.name))
-        widgets.tableWidget_3.setItem(row, 2, QTableWidgetItem(patient.age))
-        # widgets.tableWidget_3.setItem(row, 3, QTableWidgetItem(patient.priority))
-        widgets.tableWidget_3.setItem(row, 4, QTableWidgetItem(patient.symptoms))
-        print(patient.symptoms)
-        print("aaa")
+            widgets.tableWidget_3.setItem(row, 3, QTableWidgetItem(str(patient.priority)))
+            widgets.tableWidget_3.setItem(row, 4, QTableWidgetItem(patient.symptoms_str))
                        
-            
-
     
-
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("icon.ico"))
