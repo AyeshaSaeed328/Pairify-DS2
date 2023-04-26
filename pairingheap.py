@@ -93,9 +93,9 @@ class PairingHeap():
         if node.patient.id == id:
             return node
         while node.left_child is not None:
+            node = node.left_child
             if node.patient.id == id:
                 return node
-            node = node.left_child
             while node.sibling is not None:
                 node = node.sibling
                 if node.patient.id == id:
