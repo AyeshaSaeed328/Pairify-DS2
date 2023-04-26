@@ -197,7 +197,7 @@ class MainWindow(QMainWindow):
             patient_heap.DeleteMax()  
             self.loaddata1()
 
-        if btnName == "reset_btn":    
+        if btnName == "restet_btn":    
             self.loaddata2()    
 
         if btnName == "search_btn_2":  
