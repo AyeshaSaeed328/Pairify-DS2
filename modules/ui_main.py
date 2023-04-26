@@ -1231,7 +1231,7 @@ class Ui_MainWindow(object):
                 current_text = self.textEdit_4.toPlainText()
                 new_text = "\n".join(selected_items_text)
                 if current_text:
-                        self.textEdit_4.setPlainText(current_text + "," + new_text)
+                        self.textEdit_4.setPlainText(current_text + ", " + new_text)
                 else:
                         self.textEdit_4.setPlainText(new_text)
         self.listWidget = QListWidget(self.frame)
