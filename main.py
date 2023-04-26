@@ -194,16 +194,14 @@ class MainWindow(QMainWindow):
             
 
         if btnName == "remove_btn":  
-            patient_heap.DeleteMax()  
+            patient_heap.deleteMax()  
             self.loaddata1()
 
         if btnName == "restet_btn":    
             self.loaddata2()    
 
         if btnName == "search_btn_2":  
-            print(int(widgets.textEdit_11.toPlainText()))
             p = patient_heap.find(int(widgets.textEdit_11.toPlainText())) #will give the node with the patient having the given id
-            print(p)
             if p is not None:
                 self.search_loaddata(p.patient)
             else:
@@ -284,7 +282,7 @@ class MainWindow(QMainWindow):
         lst = patient_heap.display()
         if lst is not None:
             lst.sort(key = lambda x : x.priority, reverse=True)
-            print(lst)
+            # print(lst)
             row=0
             for patient in lst:
                 widgets.tableWidget.setItem(row, 0, QTableWidgetItem(str(patient.id)))

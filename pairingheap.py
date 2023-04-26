@@ -15,6 +15,7 @@ class Patient():
         self.symptoms_str = symptoms
         self.symptoms = symptoms.split(", ")
         self.priority = self.calculate_priority(self.symptoms)
+        # print(self.name, self.priority)
     
     def calculate_priority(self, symptoms_lst: list) -> int:
         priority = 0
@@ -34,24 +35,30 @@ class Node():
         self.left_child = None
         self.parent = None
         self.patient:Patient = patient
-    
+
+    def addChild(self, node):
+        if(self.left_child == None):
+            self.left_child = node
+        else:
+            node.sibling = self.left_child
+            self.left_child = node
         
 class PairingHeap():
     def __init__(self):
         self.root:Node = None #initializing a heap with root none
         self.inserts = 0
 
-    def MakeHeap(self, key:Patient): #makes a new heap with root having the value equal to the given key
-        new = PairingHeap()
-        new.root = Node(key)
-        return new.root #returns the root of the node
+    def MakeHeap(self, key:Patient): #makes a new Node having the value equal to the given key
+        # new = PairingHeap()
+        new_root = Node(key)
+        return new_root #returns the root of the node
 
     def insert(self, key:Patient):
         if self.root == None: #if this is the first node to insert then make a new heap and make it the root of the heap
             self.root = self.MakeHeap(key)
         else:
             new_root = self.MakeHeap(key)  #if the heap is not empty then create a new heap with the new key value
-            self.Merge(self.root, new_root) #merge the already existing hep with the new created one
+            self.root = self.Merge(self.root, new_root) #merge the already existing hep with the new created one
         
     def Merge(self, heap1:Node, heap2:Node):#takes the roots of both heaps; only roots because only the pointers of the root need to be changed
         if heap1 is None:
@@ -71,22 +78,24 @@ class PairingHeap():
     def FindMax(self): #Returns the patient with heighest priority, doesnot remove it
         return (self.root.patient.id, self.root.patient.name, self.root.patient.age, self.root.patient.symptoms)
 
-    def DeleteMax(self):#fixing needed!!
-        if not self.root:
-            return None
-        if self.root.left_child == None:
-            return None
-        max_value = self.root.patient.name
+    def deleteMax(self):
+        deleting = self.root
         children = []
-        child = self.root.left_child
-        while child:
-            children.append(child)
-            child = child.sibling
-        for i in range(0,len(children)-1):
-            children[i+1] = self.Merge(children[i], children[i+1])
-            children[i] = None
-        self.root = children[i+1]
-        return max_value
+        temp = self.root.left_child
+        children.append(temp)
+        while temp.sibling is not None:
+            temp = temp.sibling
+            children.append(temp)
+        self.root = self.double_merge(children)
+        return deleting
+ 
+    def double_merge(self, lst):
+        if len(lst) == 1:
+            return lst[0]
+        elif len(lst) == 2:
+            return self.Merge(lst[0], lst[1])
+        else:
+            return self.Merge(self.Merge(lst[0], lst[1]), self.double_merge(lst[2:]))
 
     def find(self, id):
         node = self.root
@@ -104,32 +113,35 @@ class PairingHeap():
     
     def update(self, id, name = "", age = 0, symptoms = ""):
         patient_node = self.find(id)
+        to_return = patient_node.patient
         if patient_node is not None:
             patient_node.patient.update_symptoms(symptoms)
             patient_node.patient.age = age
             patient_node.patient.name = name
             if patient_node.parent:
-                patient_node.parent.left_child = None
-            patient_node.parent = None
+                patient_node.parent.left_child = patient_node.sibling
+                patient_node.parent = None
+            
             self.Merge(self.root, patient_node)
-        return patient_node.patient
+            return to_return
+        return None
 
     def display_node(self,node:Node): 
-        all_patients = [node.patient]
-        while node.left_child is not None:
-            node = node.left_child
-            all_patients.append(node.patient)
-            while node.sibling is not None:
-                node = node.sibling
-                all_patients.append(node.patient)
-        return all_patients
+        if not node:
+            return self.all_q
+        self.all_q.append(node.patient)
+        if node.left_child:
+            self.display_node(node.left_child)
+        if node.sibling:
+            self.display_node(node.sibling)
         
     def display(self):
         if not self.root:
             return
-        return (self.display_node(self.root))
-         
-
+        self.all_q = []
+        self.display_node(self.root)
+        return (self.all_q)
+        
 patient_heap = PairingHeap()
 with open("project file 1 (1).csv", 'r') as file:
     patients_file = csv.reader(file)
@@ -141,6 +153,19 @@ with open("project file 1 (1).csv", 'r') as file:
 
 # print(patients_data.FindMax())
 # patients_data.update_priority('Charlotte', "Diarrhea, Abdominal pain, Constipation")
-# print(patients_data.display())
-# # patients_data.decrease_key('Joseph', 100)
-# patients_data.display()
+# print(((patient_heap.display())))
+# before = ((patient_heap.display()))
+# # print(patient_heap.deleteMax().patient.name)
+# # # print(patient_heap.deleteMax().patient.name)
+# # # after = ((patient_heap.display()))
+# # # print(patient_heap.deleteMax().patient.name)
+# print(patient_heap.update(2, "oooo", 10, 'Nausea').name)
+# after = ((patient_heap.display()))
+# print(len(before),len(after))
+# # # patients_data.decrease_key('Joseph', 100)
+# # patients_data.display()
+# print(len(before), len(after))
+# for i in before:
+#     if i not in after:
+#         print(i)
+# print(patient_heap.display())
