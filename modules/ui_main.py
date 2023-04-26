@@ -11,7 +11,7 @@
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
-
+import csv
 from . resources_rc import *
 
 
@@ -1241,10 +1241,19 @@ class Ui_MainWindow(object):
 
             QAbstractItemView.SelectionMode.ExtendedSelection
         )
+        # item = QListWidgetItem("Nausea")
+        # self.listWidget.addItem(item)
+        # # self.listWidget.itemSelectionChanged.connect(updateTextEdit)
         
-        for i in range(10):
-            item = QListWidgetItem("Item %i" % i)
-            self.listWidget.addItem(item)
+        # for i in range(10):
+        #     item = QListWidgetItem("Item %i" % i)
+        #     self.listWidget.addItem(item)
+
+        with open("project file 2.csv", 'r') as file:
+                symptoms_file = csv.reader(file)
+                next(symptoms_file)
+                for symptoms,priority in symptoms_file:
+                        self.listWidget.addItem(symptoms)
         self.listWidget.itemSelectionChanged.connect(updateTextEdit)
 
         
@@ -1397,7 +1406,7 @@ class Ui_MainWindow(object):
         self.label_13.setObjectName(u"label_13")
         self.label_13.setGeometry(QRect(30, 440, 131, 61))
         self.restet_btn = QPushButton(self.frame_3)
-        self.restet_btn.setObjectName(u"restet_btn")
+        self.restet_btn.setObjectName(u"reset_btn")
         self.restet_btn.setGeometry(QRect(330, 140, 75, 24))
         self.restet_btn.setStyleSheet(u"\n"
 "background-color: rgb(85, 0, 127);")
