@@ -50,7 +50,7 @@ class Patient():
         self.symptoms = symptoms
         self.id = len(lst) + 1
 
-
+   
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
