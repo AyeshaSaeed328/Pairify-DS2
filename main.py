@@ -40,18 +40,6 @@ os.environ["QT_FONT_DPI"] = "96" # FIX Problem for High DPI and Scale above 100%
 widgets = None
 
 
-        
-# lst =[]
-
-# class Patient():
-#     def __init__(self,name,age,symptoms):
-#         self.name = name
-#         self.age = age
-#         self.symptoms = symptoms
-#         self.id = len(lst) + 1
-
-# patient_heap = PairingHeap()
-
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -175,7 +163,6 @@ class MainWindow(QMainWindow):
             self.loaddata2()
 
         if btnName == "insert_btn": 
-            patient_heap.inserts += 1
             if widgets.textEdit_2.toPlainText() == "" or widgets.textEdit_3.toPlainText()== "" or widgets.textEdit_4.toPlainText() == "":
                 widgets.textEdit_5.setPlainText("You need to fill all the required fields")
                 return
@@ -184,6 +171,7 @@ class MainWindow(QMainWindow):
             # print(patient.name)
             patient_heap.insert(patient)
             patient_heap.display()
+            patient_heap.inserts += 1
             # print("aaa")
             widgets.textEdit_2.clear()
             widgets.textEdit_3.clear()
@@ -207,12 +195,6 @@ class MainWindow(QMainWindow):
             else:
                 widgets.tableWidget_3.clearContents()
 
-            # for patient in lst:
-            #     a = int(widgets.textEdit_11.toPlainText())
-            #     print(a)
-            #     if patient.id == int(widgets.textEdit_11.toPlainText()):
-            #         self.search_loaddata(patient)
-
             
         if btnName == "edit_btn_2":
             #search for patient entered in textEdit_11
@@ -221,25 +203,7 @@ class MainWindow(QMainWindow):
             age = widgets.textEdit_9.toPlainText()
             symptoms = widgets.textEdit_10.toPlainText()
             p = patient_heap.update(id, name, age, symptoms) #updates the data and returns the patient node that was updated
-
-            # p = patient_heap.find(int(widgets.textEdit_11.toPlainText())) #will give the node witht the given id
-            # p.name = widgets.textEdit_12.toPlainText()
-            # p.age = widgets.textEdit_9.toPlainText()
-            # p.symptoms = widgets.textEdit_10.toPlainText()
             self.search_loaddata(p)
-
-            # for patient in lst:
-            #     if patient.id == int(widgets.textEdit_11.toPlainText()):
-            #         patient.name = widgets.textEdit_12.toPlainText()
-            #         patient.age = widgets.textEdit_9.toPlainText()
-            #         patient.symptoms = widgets.textEdit_10.toPlainText()
-            #         self.search_loaddata(patient)
-            #         break        
-
-            
-             
-             
-
         # PRINT BTN NAME
         print(f'Button "{btnName}" pressed!')
 
@@ -255,13 +219,6 @@ class MainWindow(QMainWindow):
     def mousePressEvent(self):
         # SET DRAG POS WINDOW
         # self.dragPos = event.globalPos()
-
-        # # PRINT MOUSE EVENTS
-        # if event.buttons() == Qt.LeftButton:
-        #     print('Mouse click: LEFT CLICK')
-        # if event.buttons() == Qt.RightButton:
-        #     print('Mouse click: RIGHT CLICK')
-        
         widgets.textEdit_5.clear()
         a = widgets.tableWidget_3.currentRow()
         pid = widgets.tableWidget_3.item(a,0).text()
@@ -274,7 +231,6 @@ class MainWindow(QMainWindow):
         widgets.textEdit_12.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
         widgets.textEdit_9.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
         widgets.textEdit_10.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-        print(pid,pname)
         return (pid,pname,page,psymptoms)
          
 
@@ -282,7 +238,6 @@ class MainWindow(QMainWindow):
         lst = patient_heap.display()
         if lst is not None:
             lst.sort(key = lambda x : x.priority, reverse=True)
-            # print(lst)
             row=0
             for patient in lst:
                 widgets.tableWidget.setItem(row, 0, QTableWidgetItem(str(patient.id)))
