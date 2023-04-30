@@ -166,6 +166,7 @@ class MainWindow(QMainWindow):
             if widgets.textEdit_2.toPlainText() == "" or widgets.textEdit_3.toPlainText()== "" or widgets.textEdit_4.toPlainText() == "":
                 widgets.textEdit_5.setPlainText("You need to fill all the required fields")
                 return
+            #creates the patient class object
             patient = Patient(widgets.textEdit_2.toPlainText(),widgets.textEdit_3.toPlainText(),widgets.textEdit_4.toPlainText(), patient_heap.inserts)
             # lst.append(patient)
             # print(patient.name)
@@ -182,13 +183,14 @@ class MainWindow(QMainWindow):
             
 
         if btnName == "remove_btn":  
-            patient_heap.deleteMax()  
+            patient_heap.deleteMax()   #removes the root
             self.loaddata1()
 
         if btnName == "restet_btn":    
             self.loaddata2()    
 
         if btnName == "search_btn_2":  
+            #calling the find function from pairing heap class
             p = patient_heap.find(int(widgets.textEdit_11.toPlainText())) #will give the node with the patient having the given id
             if p is not None:
                 self.search_loaddata(p.patient)
@@ -202,6 +204,7 @@ class MainWindow(QMainWindow):
             name = widgets.textEdit_12.toPlainText()
             age = widgets.textEdit_9.toPlainText()
             symptoms = widgets.textEdit_10.toPlainText()
+            #calling the update function from pairing heap class
             p = patient_heap.update(id, name, age, symptoms) #updates the data and returns the patient node that was updated
             self.search_loaddata(p)
         # PRINT BTN NAME

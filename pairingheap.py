@@ -7,13 +7,13 @@ with open("project file 2.csv", 'r') as file:
     for symptoms,priority in symptoms_file:
         symptoms_dict[symptoms] = priority #{symptom: priority}
 
-#making the Pateint class so it can be used as an object whe inserting into the Pairing heap
+#making the Patient class so it can be used as an object when inserting into the Pairing heap
 class Patient():
     def __init__(self, name, age, symptoms, id = 0) -> None:
         self.id = id
         self.name = name
         self.age = age
-        self.symptoms_str = symptoms
+        self.symptoms_str = symptoms #symptoms are a string
         self.symptoms = symptoms.split(", ")
         self.priority = self.calculate_priority(self.symptoms)
     
@@ -35,7 +35,7 @@ class Node():
         self.child = None
         self.sibling_before = None
         self.parent = None
-        self.patient:Patient = patient
+        self.patient:Patient = patient #each node has a key corresponding to the patient class object
 
         
 class PairingHeap():
@@ -82,11 +82,11 @@ class PairingHeap():
         children.append(temp)
         while temp.sibling_after is not None:
             temp = temp.sibling_after
-            children.append(temp)
+            children.append(temp) #the conection between all the children is broken and they are appended in an array
         self.root = self.double_merge(children)
         return deleting
  
-    def double_merge(self, lst):
+    def double_merge(self, lst): #recursively calls itself and the merge function to reconnect all the children of the node being deleted/root
         if len(lst) == 1:
             return lst[0]
         elif len(lst) == 2:
@@ -94,7 +94,7 @@ class PairingHeap():
         else:
             return self.Merge(self.Merge(lst[0], lst[1]), self.double_merge(lst[2:]))
 
-    def find(self, id): #find if an id value exists in the data or not
+    def find(self, id): #find if an id value exists in the data or not, returns the node
         node = self.root
         if node.patient.id == id:
             return node
@@ -108,7 +108,7 @@ class PairingHeap():
                     return node
         return None
     
-    def update(self, id, name = "", age = "", symptoms = ""):
+    def update(self, id, name = "", age = "", symptoms = ""): #takes the updated values from the gui and updates the patient's attributes
         patient_node = self.find(id)
         to_return = patient_node.patient
         if patient_node is not None:
@@ -118,8 +118,8 @@ class PairingHeap():
                 patient_node.patient.age = age
             if name != "":
                 patient_node.patient.name = name
-
-            if patient_node == self.root:
+        #rearranging the heap becuase the priority of the node that is updated may have changed
+            if patient_node == self.root: #if it is the root then function as the delete root function but donot lose the root instead merge it with the heap at the end
                 children = []
                 temp = self.root.child
                 children.append(temp)
@@ -129,20 +129,20 @@ class PairingHeap():
                 self.root.child = None
                 self.root = self.double_merge(children)
 
-            elif patient_node.parent:
+            elif patient_node.parent: #if it has some parent the rearrange the pointers as such to ensure the heap stays as one and the node updated is isolated
                 patient_node.parent.child = patient_node.sibling_after
                 if patient_node.sibling_after:
                     patient_node.sibling_after.parent = patient_node.parent
                 patient_node.parent = None
-            else:
+            else: #if it has no parent then rebuild the connection between the sibling before and after and isolate the updated node
                 patient_node.sibling_after.sibling_before = patient_node.sibling_before
                 patient_node.sibling_before.sibling_after = patient_node.sibling_after
             
-            self.Merge(self.root, patient_node)
+            self.Merge(self.root, patient_node) #remerge the updated node
             return to_return
         return None
 
-    def display_node(self,node:Node): 
+    def display_node(self,node:Node):  #recursively traversing the heap and appending in the list
         if not node:
             return self.all_q
         self.all_q.append(node.patient)
