@@ -7,6 +7,7 @@ with open("project file 2.csv", 'r') as file:
     for symptoms,priority in symptoms_file:
         symptoms_dict[symptoms] = priority #{symptom: priority}
 
+#making the Pateint class so it can be used as an object whe inserting into the Pairing heap
 class Patient():
     def __init__(self, name, age, symptoms, id = 0) -> None:
         self.id = id
@@ -22,7 +23,7 @@ class Patient():
             priority += int(symptoms_dict[symptom]) #for every symptom, adds its priority in patients priority
         return priority
     
-    def update_symptoms(self, symptoms_lst:str):
+    def update_symptoms(self, symptoms_lst:str): #updates the symptoms and thus the priority value as well
         self.symptoms_str = symptoms_lst
         self.symptoms = symptoms_lst.split(", ")
         self.priority = self.calculate_priority(self.symptoms)
@@ -74,7 +75,7 @@ class PairingHeap():
     def FindMax(self): #Returns the patient with heighest priority, doesnot remove it
         return (self.root.patient.id, self.root.patient.name, self.root.patient.age, self.root.patient.symptoms)
 
-    def deleteMax(self):
+    def deleteMax(self): #Deletes the patient with heighest priority and removes it, and thus a new root value is created
         deleting = self.root
         children = []
         temp = self.root.child
@@ -93,7 +94,7 @@ class PairingHeap():
         else:
             return self.Merge(self.Merge(lst[0], lst[1]), self.double_merge(lst[2:]))
 
-    def find(self, id):
+    def find(self, id): #find if an id value exists in the data or not
         node = self.root
         if node.patient.id == id:
             return node
